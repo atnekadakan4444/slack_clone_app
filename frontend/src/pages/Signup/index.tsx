@@ -13,7 +13,11 @@ function Signup() {
 
     try {
       console.log("Sending signup data:", { name, email, password: "***" });
-      const { user, token } = await authRepository.signup(name, email, password);
+      const { user, token } = await authRepository.signup(
+        name,
+        email,
+        password,
+      );
       console.log("Signed up user:", user);
       console.log("Received token:", token);
     } catch (error: any) {
