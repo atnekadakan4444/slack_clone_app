@@ -1,7 +1,29 @@
-import { Link } from 'react-router-dom';
-import './auth.css';
+import { Link } from "react-router-dom";
+import "./auth.css";
+import { authRepository } from "../../modules/auth/auth.repository";
+import { useState } from "react";
 
 function Signup() {
+  const [name, setName] = useState("");
+  const [email, setEmail] = useState("");
+  const [password, setPassword] = useState("");
+
+  const signup = async () => {
+    if (name === "" || email === "" || password === "") return;
+
+    try {
+      console.log("Sending signup data:", { name, email, password: "***" });
+      const { user, token } = await authRepository.signup(name, email, password);
+      console.log("Signed up user:", user);
+      console.log("Received token:", token);
+    } catch (error: any) {
+      console.error("Signup error:", error);
+      console.error("Error response:", error.response?.data);
+      console.error("Error status:", error.response?.status);
+      alert(`登録エラー: ${error.response?.data?.message || error.message}`);
+    }
+  };
+
   return (
     <div className="signup-container">
       <div className="signup-form-container">
@@ -12,17 +34,40 @@ function Signup() {
 
         <div>
           <div className="form-group">
-            <input type="text" placeholder="Full name" required />
+            <input
+              type="text"
+              placeholder="Full name"
+              value={name}
+              onChange={(e) => setName(e.target.value)}
+              required
+            />
           </div>
 
           <div className="form-group">
-            <input type="email" placeholder="Email" required />
+            <input
+              type="email"
+              placeholder="Email"
+              value={email}
+              onChange={(e) => setEmail(e.target.value)}
+              required
+            />
           </div>
 
           <div className="form-group">
-            <input type="password" placeholder="Password" required />
+            <input
+              type="password"
+              placeholder="Password"
+              value={password}
+              onChange={(e) => setPassword(e.target.value)}
+              required
+            />
           </div>
-          <button type="submit" className="continue-button">
+          <button
+            type="submit"
+            className="continue-button"
+            disabled={name === "" || email === "" || password === ""}
+            onClick={signup}
+          >
             Continue
           </button>
         </div>
