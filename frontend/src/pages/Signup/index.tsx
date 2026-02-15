@@ -20,6 +20,7 @@ function Signup() {
         email,
         password,
       );
+      localStorage.setItem("token", token);
       setCurrentUser(user);
       // console.log("Signed up user:", user);
       // console.log("Received token:", token);

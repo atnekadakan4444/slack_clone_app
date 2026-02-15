@@ -15,6 +15,7 @@ function Signin() {
     try {
       console.log("Sending signin data:", { email, password: "***" });
       const { user, token } = await authRepository.signin(email, password);
+      localStorage.setItem("token", token);
       setCurrentUser(user);
       // console.log("Signed in user:", user);
       // console.log("Received token:", token);
