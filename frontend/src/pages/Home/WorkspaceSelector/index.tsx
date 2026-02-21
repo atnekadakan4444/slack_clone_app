@@ -1,23 +1,45 @@
-import CreateWorkspaceModal from './CreateWorkspaceModal';
-import ProfileModal from './ProfileModal';
+import { useNavigate } from "react-router-dom";
+import { useUiStore } from "../../../modules/ui/ui.state";
+import { workspaceRepository } from "../../../modules/workspaces/workspace.repository";
+import CreateWorkspaceModal from "./CreateWorkspaceModal";
+import ProfileModal from "./ProfileModal";
 
 function WorkspaceSelector() {
+  const { showCreateWorkspaceModal, setShowCreateWorkspaceModal } =
+    useUiStore();
+  const navigate = useNavigate();
+
+  const createWorkspace = async (name: string) => {
+    try {
+      const newWorkspace = await workspaceRepository.create(name);
+      setShowCreateWorkspaceModal(false);
+      navigate(`/${newWorkspace.id}/${newWorkspace.channels[0].id}`);
+    } catch (error) {
+      console.error("Failed to create workspace:", error);
+    }
+  };
+
   return (
     <div className="workspace-selector">
       <div className="workspaces">
-        <div key={1} className={'workspace-icon'}>
+        <div key={1} className={"workspace-icon"}>
           A
         </div>
-        <div key={2} className={'workspace-icon'}>
+        <div key={2} className={"workspace-icon"}>
           B
         </div>
-        <div className="workspace-icon add">+</div>
+        <div
+          className="workspace-icon add"
+          onClick={() => setShowCreateWorkspaceModal(true)}
+        >
+          +
+        </div>
       </div>
       <div className="user-profile">
         <div className={`avatar-img `}>
           <img
             src={
-              'https://cdn.pixabay.com/photo/2016/08/08/09/17/avatar-1577909_960_720.png'
+              "https://cdn.pixabay.com/photo/2016/08/08/09/17/avatar-1577909_960_720.png"
             }
             alt="Posted image"
             className="message-image"
@@ -41,7 +63,9 @@ function WorkspaceSelector() {
           </svg>
         </div>
       </div>
-      {/* <CreateWorkspaceModal /> */}
+      {showCreateWorkspaceModal && (
+        <CreateWorkspaceModal onSubmit={createWorkspace} allowCancel={true} />
+      )}
       {/* <ProfileModal /> */}
     </div>
   );
