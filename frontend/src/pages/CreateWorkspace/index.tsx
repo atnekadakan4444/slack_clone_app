@@ -1,22 +1,47 @@
 import "../Signup/auth.css";
 import CreateWorkspaceModal from "../Home/WorkspaceSelector/CreateWorkspaceModal";
 import { useCurrentUserStore } from "../../modules/auth/current-user.state";
-import { Navigate } from "react-router-dom";
+import { Navigate, useNavigate } from "react-router-dom";
 import { workspaceRepository } from "../../modules/workspaces/workspace.repository";
+import { useEffect, useState } from "react";
+import type { Workspace } from "../../modules/workspaces/workspace.entity";
 
 function CreateWorkspace() {
   const { currentUser } = useCurrentUserStore();
+  const navigate = useNavigate();
+  const [homeWorkspace, setHomeWorkspace] = useState<Workspace>();
+  const [isLoading, setIsLoading] = useState(true);
+
+  useEffect(() => {
+    fetchWorkspaces();
+  }, []);
+
+  const fetchWorkspaces = async () => {
+    const workspaces = await workspaceRepository.find();
+    try {
+      setHomeWorkspace(workspaces[0]);
+    } catch (error) {
+      console.error("ワークスペースの取得に失敗:", error);
+    } finally {
+      setIsLoading(false);
+    }
+  };
 
   const createWorkspace = async (name: string) => {
     try {
       const newWorkspace = await workspaceRepository.create(name);
-      console.log("Created workspace:", newWorkspace);
+      navigate(`/${newWorkspace.id}/${newWorkspace.channels[0].id}`);
     } catch (error) {
       console.error("ワークスペースの作成に失敗:", error);
     }
   };
 
+  if (isLoading) return <div />;
   if (currentUser == null) return <Navigate to="/signin" />;
+  if (homeWorkspace != null)
+    return (
+      <Navigate to={`/${homeWorkspace.id}/${homeWorkspace.channels[0].id}`} />
+    );
 
   return (
     <div>
