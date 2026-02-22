@@ -3,8 +3,14 @@ import { useUiStore } from "../../../modules/ui/ui.state";
 import { workspaceRepository } from "../../../modules/workspaces/workspace.repository";
 import CreateWorkspaceModal from "./CreateWorkspaceModal";
 import ProfileModal from "./ProfileModal";
+import type { Workspace } from "../../../modules/workspaces/workspace.entity";
 
-function WorkspaceSelector() {
+interface Props {
+  workspaces: Workspace[];
+}
+
+function WorkspaceSelector(props: Props) {
+  const { workspaces } = props;
   const { showCreateWorkspaceModal, setShowCreateWorkspaceModal } =
     useUiStore();
   const navigate = useNavigate();
@@ -22,12 +28,18 @@ function WorkspaceSelector() {
   return (
     <div className="workspace-selector">
       <div className="workspaces">
-        <div key={1} className={"workspace-icon"}>
-          A
-        </div>
-        <div key={2} className={"workspace-icon"}>
-          B
-        </div>
+        {workspaces.map((workspace) => (
+          <div
+            key={workspace.id}
+            className={"workspace-icon"}
+            onClick={() =>
+              navigate(`/${workspace.id}/${workspace.channels[0].id}`)
+            }
+          >
+            {workspace.name.charAt(0)}
+          </div>
+        ))}
+        <div key="add" className={"workspace-icon add"}></div>
         <div
           className="workspace-icon add"
           onClick={() => setShowCreateWorkspaceModal(true)}
