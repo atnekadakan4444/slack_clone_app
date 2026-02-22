@@ -1,11 +1,18 @@
+import type { Workspace } from '../../../modules/workspaces/workspace.entity';
 import CreateChannelModal from './CreateChannelModal';
 import UserSearchModal from './UserSearchModal';
 
-function Sidebar() {
+interface Props {
+  selectedWorkspace: Workspace;
+}
+
+function Sidebar(props: Props) {
+  const { selectedWorkspace } = props;
+
   return (
     <div className="sidebar">
       <div className="workspace-header">
-        <h2>{'test'}</h2>
+        <h2>{selectedWorkspace.name}</h2>
       </div>
       <div className="sidebar-section">
         <div className="section-header channels-header">
