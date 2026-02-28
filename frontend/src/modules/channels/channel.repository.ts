@@ -9,5 +9,9 @@ export const channelRepository = {
     async create(workspaceId: string, name: string) {
         const response = await api.post("/channels", { workspaceId, name });
         return new Channel(response.data);
+    },
+    async delete(channelId: string): Promise<boolean> {
+        const response = await api.delete(`/channels/${channelId}`);
+        return response.status === 200;
     }
 };

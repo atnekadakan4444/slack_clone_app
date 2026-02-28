@@ -1,11 +1,39 @@
+import { useNavigate } from "react-router-dom";
 import type { Channel } from "../../../modules/channels/channel.entity";
+import { channelRepository } from "../../../modules/channels/channel.repository";
 
 interface Props {
   selectedChannel: Channel;
+  channels: Channel[];
+  setChannels: (channels: Channel[]) => void;
+  selectedWorkspaceId: string;
 }
 
 function MainContent(props: Props) {
-  const { selectedChannel } = props;
+  const { selectedChannel, channels, setChannels, selectedWorkspaceId } = props;
+  const navigation = useNavigate();
+
+  const deleteChannel = async () => {
+    if (!window.confirm("チャンネルを削除しますか？")) {
+      return;
+    }
+    try {
+      console.log("Deleting channel with ID:", selectedChannel.id);
+      const success = await channelRepository.delete(selectedChannel.id);
+      if (success) {
+        const updatedChannels = channels.filter(
+          (ch) => ch.id !== selectedChannel.id,
+        );
+        setChannels(updatedChannels);
+        navigation(`/${selectedWorkspaceId}/${updatedChannels[0]?.id || ""}`);
+      } else {
+        alert("チャンネルの削除に失敗しました。");
+      }
+    } catch (error) {
+      console.error("Error deleting channel:", error);
+      alert("チャンネルの削除中にエラーが発生しました。");
+    }
+  };
 
   return (
     <div className="main-content">
@@ -16,7 +44,7 @@ function MainContent(props: Props) {
         <div className="channel-actions">
           <button
             className="delete-channel-button"
-            onClick={() => {}}
+            onClick={deleteChannel}
             title="チャンネルを削除"
           >
             <svg viewBox="0 0 24 24" width="16" height="16" fill="currentColor">
@@ -27,18 +55,18 @@ function MainContent(props: Props) {
       </header>
       <div
         className="messages-container"
-        style={{ overflowY: 'auto', maxHeight: 'calc(100vh - 150px)' }}
+        style={{ overflowY: "auto", maxHeight: "calc(100vh - 150px)" }}
       >
         <div
           key={1}
-          style={{ display: 'flex', flexDirection: 'column-reverse' }}
+          style={{ display: "flex", flexDirection: "column-reverse" }}
         >
           <div key={1} className="message">
             <div className="avatar">
               <div className={`avatar-img `}>
                 <img
                   src={
-                    'https://cdn.pixabay.com/photo/2016/08/08/09/17/avatar-1577909_960_720.png'
+                    "https://cdn.pixabay.com/photo/2016/08/08/09/17/avatar-1577909_960_720.png"
                   }
                   alt="Posted image"
                   className="message-image"
@@ -47,8 +75,8 @@ function MainContent(props: Props) {
             </div>
             <div className="message-content">
               <div className="message-header">
-                <span className="username">{'test'}</span>
-                <span className="timestamp">{'2025/05/11 12:23'}</span>
+                <span className="username">{"test"}</span>
+                <span className="timestamp">{"2025/05/11 12:23"}</span>
                 <button
                   className="message-delete-button"
                   title="メッセージを削除"
@@ -63,11 +91,11 @@ function MainContent(props: Props) {
                   </svg>
                 </button>
               </div>
-              <div className="message-text">{'test'}</div>
+              <div className="message-text">{"test"}</div>
             </div>
           </div>
           <div className="date-divider">
-            <span>{'2025/05/11'}</span>
+            <span>{"2025/05/11"}</span>
           </div>
         </div>
       </div>
@@ -75,7 +103,7 @@ function MainContent(props: Props) {
         <div className="message-input-wrapper">
           <textarea className="message-input" placeholder="Message" />
           <div className="image-upload">
-            <input type="file" style={{ display: 'none' }} accept="image/*" />
+            <input type="file" style={{ display: "none" }} accept="image/*" />
             <button className="action-button">
               <svg
                 viewBox="0 0 20 20"

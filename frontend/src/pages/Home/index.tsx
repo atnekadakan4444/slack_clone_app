@@ -67,7 +67,12 @@ function Home() {
             selectedChannelId={channelId!}
             setChannels={setChannels}
           />
-          <MainContent selectedChannel={selectedChannel} />
+          <MainContent
+            selectedChannel={selectedChannel}
+            channels={channels}
+            setChannels={setChannels}
+            selectedWorkspaceId={workspaceId}
+          />
         </>
       ) : (
         <div className="sidebar" />
