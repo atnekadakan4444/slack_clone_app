@@ -1,6 +1,20 @@
-function CreateChannelModal() {
+import { useState } from "react";
+import { useUiStore } from "../../../modules/ui/ui.state";
+
+interface Props {
+  onSubmit: (name: string) => void;
+}
+
+function CreateChannelModal(props: Props) {
+  const { onSubmit } = props;
+  const { setShowCreateChannelModal } = useUiStore();
+  const [channelName, setChannelName] = useState("");
+
   return (
-    <div className="profile-modal-overlay">
+    <div
+      className="profile-modal-overlay"
+      onClick={() => setShowCreateChannelModal(false)}
+    >
       <div className="profile-modal" onClick={(e) => e.stopPropagation()}>
         <div className="profile-modal-header">
           <h2>新しいチャンネルを作成</h2>
@@ -16,6 +30,8 @@ function CreateChannelModal() {
                 name="channelName"
                 className="profile-input"
                 placeholder="新しいチャンネル名を入力してください"
+                value={channelName}
+                onChange={(e) => setChannelName(e.target.value)}
                 autoFocus
               />
               <div className="help-text">
@@ -26,8 +42,15 @@ function CreateChannelModal() {
         </div>
 
         <div className="profile-modal-footer">
-          <button className="cancel-button">キャンセル</button>
-          <button className="save-button">作成</button>
+          <button
+            className="cancel-button"
+            onClick={() => setShowCreateChannelModal(false)}
+          >
+            キャンセル
+          </button>
+          <button className="save-button" onClick={() => onSubmit(channelName)}>
+            作成
+          </button>
         </div>
       </div>
     </div>

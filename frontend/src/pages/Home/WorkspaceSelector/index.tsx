@@ -7,11 +7,12 @@ import type { Workspace } from "../../../modules/workspaces/workspace.entity";
 
 interface Props {
   workspaces: Workspace[];
+  setWorkspaces: (workspaces: Workspace[]) => void;
   selectedWorkspaceId: string;
 }
 
 function WorkspaceSelector(props: Props) {
-  const { workspaces, selectedWorkspaceId } = props;
+  const { workspaces, setWorkspaces, selectedWorkspaceId } = props;
   const { showCreateWorkspaceModal, setShowCreateWorkspaceModal } =
     useUiStore();
   const navigate = useNavigate();
@@ -20,6 +21,7 @@ function WorkspaceSelector(props: Props) {
     try {
       const newWorkspace = await workspaceRepository.create(name);
       setShowCreateWorkspaceModal(false);
+      setWorkspaces([...workspaces, newWorkspace]);
       navigate(`/${newWorkspace.id}/${newWorkspace.channels[0].id}`);
     } catch (error) {
       console.error("Failed to create workspace:", error);
@@ -40,7 +42,6 @@ function WorkspaceSelector(props: Props) {
             {workspace.name.charAt(0)}
           </div>
         ))}
-        <div key="add" className={"workspace-icon add"}></div>
         <div
           className="workspace-icon add"
           onClick={() => setShowCreateWorkspaceModal(true)}
