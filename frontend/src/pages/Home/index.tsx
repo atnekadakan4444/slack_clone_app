@@ -65,6 +65,7 @@ function Home() {
             selectedWorkspace={selectedWorkspace}
             channels={channels}
             selectedChannelId={channelId!}
+            setChannels={setChannels}
           />
           <MainContent selectedChannel={selectedChannel} />
         </>

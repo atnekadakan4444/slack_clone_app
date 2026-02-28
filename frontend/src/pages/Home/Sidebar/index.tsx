@@ -11,10 +11,11 @@ interface Props {
   selectedWorkspace: Workspace;
   selectedChannelId: string;
   channels: Channel[];
+  setChannels: (channels: Channel[]) => void;
 }
 
 function Sidebar(props: Props) {
-  const { selectedWorkspace, selectedChannelId, channels } = props;
+  const { selectedWorkspace, selectedChannelId, channels, setChannels } = props;
   const { showCreateChannelModal, setShowCreateChannelModal } = useUiStore();
   const navigate = useNavigate();
 
@@ -24,6 +25,7 @@ function Sidebar(props: Props) {
         selectedWorkspace.id,
         name,
       );
+      setChannels([...channels, newChannel]);
       setShowCreateChannelModal(false);
       navigate(`/${selectedWorkspace.id}/${newChannel.id}`);
     } catch (error) {
