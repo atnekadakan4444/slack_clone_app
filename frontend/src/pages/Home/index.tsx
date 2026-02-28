@@ -15,12 +15,14 @@ function Home() {
   const [workspaces, setWorkspaces] = useState<Workspace[]>([]);
   const [channels, setChannels] = useState<Channel[]>([]);
   const params = useParams();
-  const { workspaceId } = params;
-  const selectedWorkspace =
-    workspaces.find((w) => w.id === workspaceId);
+  const { workspaceId, channelId } = params;
+  const selectedWorkspace = workspaces.find((w) => w.id === workspaceId);
 
   // undefined（または空文字）の場合は早期リターン
-  if (!workspaceId) return <div>エラー: ワークスペースIDがURLに含まれていません。</div>;
+  if (!workspaceId)
+    return <div>エラー: ワークスペースIDがURLに含まれていません。</div>;
+
+  const selectedChannel = channels.find((c) => c.id === channelId);
 
   useEffect(() => {
     fetchWorkspaces();
@@ -57,13 +59,17 @@ function Home() {
         setWorkspaces={setWorkspaces}
         selectedWorkspaceId={workspaceId}
       />
-      {selectedWorkspace != null ? (
+      {selectedWorkspace != null && selectedChannel != null ? (
         <>
-          <Sidebar selectedWorkspace={selectedWorkspace} />
-          <MainContent />
+          <Sidebar
+            selectedWorkspace={selectedWorkspace}
+            channels={channels}
+            selectedChannelId={channelId!}
+          />
+          <MainContent selectedChannel={selectedChannel} />
         </>
       ) : (
-        <div className="sidebar"/>
+        <div className="sidebar" />
       )}
     </div>
   );

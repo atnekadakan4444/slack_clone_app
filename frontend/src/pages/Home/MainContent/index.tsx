@@ -1,9 +1,17 @@
-function MainContent() {
+import type { Channel } from "../../../modules/channels/channel.entity";
+
+interface Props {
+  selectedChannel: Channel;
+}
+
+function MainContent(props: Props) {
+  const { selectedChannel } = props;
+
   return (
     <div className="main-content">
       <header className="channel-header">
         <div className="channel-info">
-          <h2># {'test'}</h2>
+          <h2># {selectedChannel.name}</h2>
         </div>
         <div className="channel-actions">
           <button
