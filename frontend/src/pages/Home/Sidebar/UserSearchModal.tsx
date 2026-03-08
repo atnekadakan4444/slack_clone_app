@@ -113,11 +113,15 @@ function UserSearchModal(props: Props) {
               <div className="loading-indicator">検索中...</div>
             ) : (
               searchResults.map((user) => {
+                const isInWorkspace = user.workspaceUsers?.some(
+                  (workspaceUser) => workspaceUser.workspaceId === workspaceId,
+                );
+
                 return (
                   <div
                     key={user.id}
-                    className={`user-suggestion-item`}
-                    onClick={() => addUser(user)}
+                    className={`user-suggestion-item ${isInWorkspace ? "already-invited" : ""}`}
+                    onClick={ isInWorkspace ? undefined : () => addUser(user) }
                   >
                     <img
                       src={user.iconUrl}
@@ -127,6 +131,7 @@ function UserSearchModal(props: Props) {
                     <div className="user-info">
                       <div className="user-name">{user.name}</div>
                       <div className="user-email">{user.email}</div>
+                      { isInWorkspace && <div className="already-invited-tag">既に招待済みです</div> }
                     </div>
                   </div>
                 );
