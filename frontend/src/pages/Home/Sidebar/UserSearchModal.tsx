@@ -1,7 +1,37 @@
+import { useEffect, useState } from "react";
 import { useUiStore } from "../../../modules/ui/ui.state";
+import type { User } from "../../../modules/users/user.entity";
+import { userRepository } from "../../../modules/users/user.repository";
+import { useDebouncedCallback } from "use-debounce";
 
 function UserSearchModal() {
   const { setShowUserSearchModal, showUserSearchModal } = useUiStore();
+  const [keyword, setKeyword] = useState("");
+  const [searchResults, setSearchResults] = useState<User[]>([]);
+  const [isLoading, setIsLoading] = useState(false);
+
+  const searchUsers = async () => {
+    if (keyword == "") {
+      setSearchResults([]);
+      return;
+    }
+    setIsLoading(true);
+    try {
+      const users = await userRepository.find(keyword);
+      // setSearchResults(users);
+      console.log(users);
+    } catch (error) {
+      console.error("ユーザーの検索に失敗しました:", error);
+    } finally {
+      setIsLoading(false);
+    }
+  };
+
+  const debouncedSearch = useDebouncedCallback(searchUsers, 500);
+
+  useEffect(() => {
+    debouncedSearch();
+  }, [keyword]);
 
   return (
     <div
@@ -34,7 +64,13 @@ function UserSearchModal() {
                 <span>{"test"}</span>
                 <button className="remove-user-button">×</button>
               </div>
-              <input type="text" id="invite-input" className="invite-input" />
+              <input
+                type="text"
+                id="invite-input"
+                className="invite-input"
+                value={keyword}
+                onChange={(e) => setKeyword(e.target.value)}
+              />
             </div>
           </div>
           <div className="user-suggestions">
@@ -65,3 +101,6 @@ function UserSearchModal() {
 }
 
 export default UserSearchModal;
+function useDebouncedeCallback(searchUsers: () => Promise<void>, arg1: number) {
+  throw new Error("Function not implemented.");
+}
