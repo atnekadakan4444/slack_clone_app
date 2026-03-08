@@ -1,6 +1,13 @@
+import { useUiStore } from "../../../modules/ui/ui.state";
+
 function ProfileModal() {
+  const { setShowProfileModal } = useUiStore();
+
   return (
-    <div className="profile-modal-overlay">
+    <div
+      className="profile-modal-overlay"
+      onClick={() => setShowProfileModal(false)}
+    >
       <div className="profile-modal" onClick={(e) => e.stopPropagation()}>
         <div className="profile-modal-header">
           <h2>Edit your profile</h2>
@@ -30,7 +37,7 @@ function ProfileModal() {
                 <input
                   type="file"
                   accept="image/*"
-                  style={{ display: 'none' }}
+                  style={{ display: "none" }}
                 />
                 <button className="upload-photo-button">Upload Photo</button>
               </div>
@@ -39,7 +46,12 @@ function ProfileModal() {
         </div>
 
         <div className="profile-modal-footer">
-          <button className="cancel-button">Cancel</button>
+          <button
+            className="cancel-button"
+            onClick={() => setShowProfileModal(false)}
+          >
+            Cancel
+          </button>
           <button className="save-button">Save Changes</button>
         </div>
       </div>
