@@ -8,7 +8,20 @@ function UserSearchModal() {
   const { setShowUserSearchModal, showUserSearchModal } = useUiStore();
   const [keyword, setKeyword] = useState("");
   const [searchResults, setSearchResults] = useState<User[]>([]);
+  const [selectedUsers, setSelectedUsers] = useState<User[]>([]);
   const [isLoading, setIsLoading] = useState(false);
+
+  const addUser = (user: User) => {
+    if (!selectedUsers.some((u) => u.id === user.id)) {
+      setSelectedUsers([...selectedUsers, user]);
+    }
+    setKeyword("");
+    setSearchResults([]);
+  };
+
+  const removeUser = (userId: string) => {
+    setSelectedUsers(selectedUsers.filter((u) => u.id !== userId));
+  };
 
   const searchUsers = async () => {
     if (keyword == "") {
@@ -18,8 +31,7 @@ function UserSearchModal() {
     setIsLoading(true);
     try {
       const users = await userRepository.find(keyword);
-      // setSearchResults(users);
-      console.log(users);
+      setSearchResults(users);
     } catch (error) {
       console.error("ユーザーの検索に失敗しました:", error);
     } finally {
@@ -53,17 +65,22 @@ function UserSearchModal() {
           <div className="invite-form">
             <label htmlFor="invite-input">招待するメンバー：</label>
             <div className="selected-users-container">
-              <div key={1} className="selected-user-chip">
-                <img
-                  src={
-                    "https://cdn.pixabay.com/photo/2016/08/08/09/17/avatar-1577909_960_720.png"
-                  }
-                  alt={"test"}
-                  className="user-avatar small"
-                />
-                <span>{"test"}</span>
-                <button className="remove-user-button">×</button>
-              </div>
+              {selectedUsers.map((user) => (
+                <div key={user.id} className="selected-user-chip">
+                  <img
+                    src={user.iconUrl}
+                    alt={user.name}
+                    className="user-avatar small"
+                  />
+                  <span>{user.name}</span>
+                  <button
+                    className="remove-user-button"
+                    onClick={() => removeUser(user.id)}
+                  >
+                    ×
+                  </button>
+                </div>
+              ))}
               <input
                 type="text"
                 id="invite-input"
@@ -74,21 +91,29 @@ function UserSearchModal() {
             </div>
           </div>
           <div className="user-suggestions">
-            return (
-            <div key={1} className={`user-suggestion-item`}>
-              <img
-                src={
-                  "https://cdn.pixabay.com/photo/2016/08/08/09/17/avatar-1577909_960_720.png"
-                }
-                alt={"test"}
-                className="user-avatar"
-              />
-              <div className="user-info">
-                <div className="user-name">{"test"}</div>
-                <div className="user-email">{"test@test.com"}</div>
-              </div>
-            </div>
-            );
+            {isLoading ? (
+              <div className="loading-indicator">検索中...</div>
+            ) : (
+              searchResults.map((user) => {
+                return (
+                  <div
+                    key={user.id}
+                    className={`user-suggestion-item`}
+                    onClick={() => addUser(user)}
+                  >
+                    <img
+                      src={user.iconUrl}
+                      alt={user.name}
+                      className="user-avatar"
+                    />
+                    <div className="user-info">
+                      <div className="user-name">{user.name}</div>
+                      <div className="user-email">{user.email}</div>
+                    </div>
+                  </div>
+                );
+              })
+            )}
           </div>
 
           <div className="modal-footer">
