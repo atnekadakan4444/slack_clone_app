@@ -3,8 +3,14 @@ import { useUiStore } from "../../../modules/ui/ui.state";
 import type { User } from "../../../modules/users/user.entity";
 import { userRepository } from "../../../modules/users/user.repository";
 import { useDebouncedCallback } from "use-debounce";
+import { workspaceUserRepository } from "../../../modules/workspace-users/workspace-user.repository";
 
-function UserSearchModal() {
+interface Props {
+  workspaceId: string;
+}
+
+function UserSearchModal(props: Props) {
+  const { workspaceId } = props;
   const { setShowUserSearchModal, showUserSearchModal } = useUiStore();
   const [keyword, setKeyword] = useState("");
   const [searchResults, setSearchResults] = useState<User[]>([]);
@@ -21,6 +27,18 @@ function UserSearchModal() {
 
   const removeUser = (userId: string) => {
     setSelectedUsers(selectedUsers.filter((u) => u.id !== userId));
+  };
+
+  const inviteUsers = async () => {
+    try {
+      await workspaceUserRepository.create(
+        workspaceId,
+        selectedUsers.map((u) => u.id),
+      );
+      setShowUserSearchModal(false);
+    } catch (error) {
+      console.error("ユーザーの招待に失敗しました:", error);
+    }
   };
 
   const searchUsers = async () => {
@@ -117,7 +135,13 @@ function UserSearchModal() {
           </div>
 
           <div className="modal-footer">
-            <button className="invite-button">招待する</button>
+            <button
+              className="invite-button"
+              onClick={() => inviteUsers()}
+              disabled={selectedUsers.length === 0}
+            >
+              招待する
+            </button>
           </div>
         </div>
       </div>

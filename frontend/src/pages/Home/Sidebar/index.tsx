@@ -71,7 +71,7 @@ function Sidebar(props: Props) {
       {showCreateChannelModal && (
         <CreateChannelModal onSubmit={createChannel} />
       )}
-      {showUserSearchModal && <UserSearchModal />}
+      {showUserSearchModal && <UserSearchModal workspaceId={selectedWorkspace.id} />}
     </div>
   );
 }
