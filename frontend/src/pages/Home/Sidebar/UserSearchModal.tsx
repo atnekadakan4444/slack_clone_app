@@ -1,10 +1,22 @@
+import { useUiStore } from "../../../modules/ui/ui.state";
+
 function UserSearchModal() {
+  const { setShowUserSearchModal, showUserSearchModal } = useUiStore();
+
   return (
-    <div className="modal-overlay">
+    <div
+      className="modal-overlay"
+      onClick={() => setShowUserSearchModal(false)}
+    >
       <div className="modal" onClick={(e) => e.stopPropagation()}>
         <div className="modal-header">
           <h2>メンバーを招待する</h2>
-          <button className="close-button">×</button>
+          <button
+            className="close-button"
+            onClick={() => setShowUserSearchModal(false)}
+          >
+            ×
+          </button>
         </div>
 
         <div className="modal-content">
@@ -14,12 +26,12 @@ function UserSearchModal() {
               <div key={1} className="selected-user-chip">
                 <img
                   src={
-                    'https://cdn.pixabay.com/photo/2016/08/08/09/17/avatar-1577909_960_720.png'
+                    "https://cdn.pixabay.com/photo/2016/08/08/09/17/avatar-1577909_960_720.png"
                   }
-                  alt={'test'}
+                  alt={"test"}
                   className="user-avatar small"
                 />
-                <span>{'test'}</span>
+                <span>{"test"}</span>
                 <button className="remove-user-button">×</button>
               </div>
               <input type="text" id="invite-input" className="invite-input" />
@@ -30,14 +42,14 @@ function UserSearchModal() {
             <div key={1} className={`user-suggestion-item`}>
               <img
                 src={
-                  'https://cdn.pixabay.com/photo/2016/08/08/09/17/avatar-1577909_960_720.png'
+                  "https://cdn.pixabay.com/photo/2016/08/08/09/17/avatar-1577909_960_720.png"
                 }
-                alt={'test'}
+                alt={"test"}
                 className="user-avatar"
               />
               <div className="user-info">
-                <div className="user-name">{'test'}</div>
-                <div className="user-email">{'test@test.com'}</div>
+                <div className="user-name">{"test"}</div>
+                <div className="user-email">{"test@test.com"}</div>
               </div>
             </div>
             );

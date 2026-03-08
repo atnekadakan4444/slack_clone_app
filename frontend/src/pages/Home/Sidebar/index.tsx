@@ -16,7 +16,7 @@ interface Props {
 
 function Sidebar(props: Props) {
   const { selectedWorkspace, selectedChannelId, channels, setChannels } = props;
-  const { showCreateChannelModal, setShowCreateChannelModal } = useUiStore();
+  const { showCreateChannelModal, setShowCreateChannelModal, showUserSearchModal, setShowUserSearchModal } = useUiStore();
   const navigate = useNavigate();
 
   const createChannel = async (name: string) => {
@@ -64,14 +64,14 @@ function Sidebar(props: Props) {
           </li>
         </ul>
 
-        <div className="section-header channels-header">
+        <div className="section-header channels-header" onClick={() => setShowUserSearchModal(true)}>
           <span className="channel-icon add">+</span> Invite Pepole
         </div>
       </div>
       {showCreateChannelModal && (
         <CreateChannelModal onSubmit={createChannel} />
       )}
-      {/* <UserSearchModal /> */}
+      {showUserSearchModal && <UserSearchModal />}
     </div>
   );
 }
