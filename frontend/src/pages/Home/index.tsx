@@ -5,15 +5,18 @@ import MainContent from "./MainContent";
 import { useCurrentUserStore } from "../../modules/auth/current-user.state";
 import { Navigate, useParams } from "react-router-dom";
 import { useEffect, useState } from "react";
-import type { Workspace } from "../../modules/workspaces/workspace.entity";
+import { Workspace } from "../../modules/workspaces/workspace.entity";
 import { workspaceRepository } from "../../modules/workspaces/workspace.repository";
-import type { Channel } from "../../modules/channels/channel.entity";
+import { Channel } from "../../modules/channels/channel.entity";
 import { channelRepository } from "../../modules/channels/channel.repository";
+import { Message } from "../../modules/messages/message.entity";
+import { messageRepository } from "../../modules/messages/message.repository";
 
 function Home() {
   const { currentUser } = useCurrentUserStore();
   const [workspaces, setWorkspaces] = useState<Workspace[]>([]);
   const [channels, setChannels] = useState<Channel[]>([]);
+  const [messages, setMessages] = useState<Message[]>([]);
   const params = useParams();
   const { workspaceId, channelId } = params;
   const selectedWorkspace = workspaces.find((w) => w.id === workspaceId);
@@ -32,6 +35,10 @@ function Home() {
     fetchChannels();
   }, [workspaceId]);
 
+  useEffect(() => {
+    fetchMessages();
+  }, [channelId]);
+
   const fetchWorkspaces = async () => {
     try {
       const workspaces = await workspaceRepository.find();
@@ -47,6 +54,15 @@ function Home() {
       setChannels(channels);
     } catch (error) {
       console.error("チャンネルの取得に失敗:", error);
+    }
+  };
+
+  const  fetchMessages = async () => {
+    try {
+      const messages = await messageRepository.find(workspaceId!, channelId!);
+      setMessages(messages);
+    } catch (error) {
+      console.error("メッセージの取得に失敗:", error);
     }
   };
 
@@ -72,6 +88,8 @@ function Home() {
             channels={channels}
             setChannels={setChannels}
             selectedWorkspaceId={workspaceId}
+            messages={messages}
+            setMessages={setMessages}
           />
         </>
       ) : (

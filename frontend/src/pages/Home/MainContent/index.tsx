@@ -3,18 +3,47 @@ import type { Channel } from "../../../modules/channels/channel.entity";
 import { channelRepository } from "../../../modules/channels/channel.repository";
 import { useState } from "react";
 import { messageRepository } from "../../../modules/messages/message.repository";
+import type { Message } from "../../../modules/messages/message.entity";
+import { useUiStore } from "../../../modules/ui/ui.state";
+import { useCurrentUserStore } from "../../../modules/auth/current-user.state";
 
 interface Props {
   selectedChannel: Channel;
   channels: Channel[];
   setChannels: (channels: Channel[]) => void;
   selectedWorkspaceId: string;
+  messages: Message[];
+  setMessages: (messages: Message[]) => void;
 }
 
 function MainContent(props: Props) {
-  const { selectedChannel, channels, setChannels, selectedWorkspaceId } = props;
+  const {
+    selectedChannel,
+    channels,
+    setChannels,
+    selectedWorkspaceId,
+    messages,
+    setMessages,
+  } = props;
+  const { currentUser } = useCurrentUserStore();
   const navigation = useNavigate();
   const [content, setContent] = useState("");
+
+  const groupMessagesByDate = () => {
+    const messageMap = new Map<string, Message[]>();
+    messages.forEach((message) => {
+      const dateKey = message.dateString;
+      if (!messageMap.has(dateKey)) {
+        messageMap.set(dateKey, []);
+      }
+      messageMap.get(dateKey)!.push(message);
+    });
+    return Array.from(messageMap.entries()).map(([date, msgs]) => ({
+      date,
+      messages: msgs,
+    }));
+  };
+  const groupedMessages = groupMessagesByDate();
 
   const deleteChannel = async () => {
     if (!window.confirm("チャンネルを削除しますか？")) {
@@ -46,6 +75,7 @@ function MainContent(props: Props) {
         content,
       );
       console.log("Created message:", newMessage);
+      setMessages([newMessage, ...messages]);
       setContent("");
     } catch (error) {
       console.error("Error creating message:", error);
@@ -75,47 +105,55 @@ function MainContent(props: Props) {
         className="messages-container"
         style={{ overflowY: "auto", maxHeight: "calc(100vh - 150px)" }}
       >
-        <div
-          key={1}
-          style={{ display: "flex", flexDirection: "column-reverse" }}
-        >
-          <div key={1} className="message">
-            <div className="avatar">
-              <div className={`avatar-img `}>
-                <img
-                  src={
-                    "https://cdn.pixabay.com/photo/2016/08/08/09/17/avatar-1577909_960_720.png"
-                  }
-                  alt="Posted image"
-                  className="message-image"
-                />
-              </div>
-            </div>
-            <div className="message-content">
-              <div className="message-header">
-                <span className="username">{"test"}</span>
-                <span className="timestamp">{"2025/05/11 12:23"}</span>
-                <button
-                  className="message-delete-button"
-                  title="メッセージを削除"
-                >
-                  <svg
-                    viewBox="0 0 24 24"
-                    width="16"
-                    height="16"
-                    fill="currentColor"
-                  >
-                    <path d="M6 19c0 1.1.9 2 2 2h8c1.1 0 2-.9 2-2V7H6v12zM19 4h-3.5l-1-1h-5l-1 1H5v2h14V4z" />
-                  </svg>
-                </button>
-              </div>
-              <div className="message-text">{"test"}</div>
+        {groupedMessages.map((group, groupIndex) => (
+          <div
+            key={groupIndex}
+            style={{ display: "flex", flexDirection: "column-reverse" }}
+          >
+            {group.messages.map((message) => {
+              const user = message.user.id == currentUser?.id ? currentUser : message.user;
+
+              return (
+                <div key={message.id} className="message">
+                  <div className="avatar">
+                    <div className={`avatar-img `}>
+                      <img
+                        src={user.iconUrl}
+                        alt="Posted image"
+                        className="message-image"
+                      />
+                    </div>
+                  </div>
+                  <div className="message-content">
+                    <div className="message-header">
+                      <span className="username">{user.name}</span>
+                      <span className="timestamp">
+                        {message.datetimeString}
+                      </span>
+                      <button
+                        className="message-delete-button"
+                        title="メッセージを削除"
+                      >
+                        <svg
+                          viewBox="0 0 24 24"
+                          width="16"
+                          height="16"
+                          fill="currentColor"
+                        >
+                          <path d="M6 19c0 1.1.9 2 2 2h8c1.1 0 2-.9 2-2V7H6v12zM19 4h-3.5l-1-1h-5l-1 1H5v2h14V4z" />
+                        </svg>
+                      </button>
+                    </div>
+                    <div className="message-text">{message.content}</div>
+                  </div>
+                </div>
+              );
+            })}
+            <div className="date-divider">
+              <span>{group.date}</span>
             </div>
           </div>
-          <div className="date-divider">
-            <span>{"2025/05/11"}</span>
-          </div>
-        </div>
+        ))}
       </div>
       <div className="message-input-container">
         <div className="message-input-wrapper">
