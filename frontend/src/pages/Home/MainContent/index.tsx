@@ -1,6 +1,8 @@
 import { useNavigate } from "react-router-dom";
 import type { Channel } from "../../../modules/channels/channel.entity";
 import { channelRepository } from "../../../modules/channels/channel.repository";
+import { useState } from "react";
+import { messageRepository } from "../../../modules/messages/message.repository";
 
 interface Props {
   selectedChannel: Channel;
@@ -12,6 +14,7 @@ interface Props {
 function MainContent(props: Props) {
   const { selectedChannel, channels, setChannels, selectedWorkspaceId } = props;
   const navigation = useNavigate();
+  const [content, setContent] = useState("");
 
   const deleteChannel = async () => {
     if (!window.confirm("チャンネルを削除しますか？")) {
@@ -32,6 +35,21 @@ function MainContent(props: Props) {
     } catch (error) {
       console.error("Error deleting channel:", error);
       alert("チャンネルの削除中にエラーが発生しました。");
+    }
+  };
+
+  const createMessage = async () => {
+    try {
+      const newMessage = await messageRepository.create(
+        selectedWorkspaceId,
+        selectedChannel.id,
+        content,
+      );
+      console.log("Created message:", newMessage);
+      setContent("");
+    } catch (error) {
+      console.error("Error creating message:", error);
+      alert("メッセージの作成中にエラーが発生しました。");
     }
   };
 
@@ -101,7 +119,12 @@ function MainContent(props: Props) {
       </div>
       <div className="message-input-container">
         <div className="message-input-wrapper">
-          <textarea className="message-input" placeholder="Message" />
+          <textarea
+            className="message-input"
+            placeholder="Message"
+            value={content}
+            onChange={(e) => setContent(e.target.value)}
+          />
           <div className="image-upload">
             <input type="file" style={{ display: "none" }} accept="image/*" />
             <button className="action-button">
@@ -118,7 +141,7 @@ function MainContent(props: Props) {
                 />
               </svg>
             </button>
-            <button className="action-button">
+            <button className="action-button" onClick={createMessage}>
               <svg
                 viewBox="0 0 20 20"
                 width="18"
