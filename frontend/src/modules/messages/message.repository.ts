@@ -27,4 +27,8 @@ export const messageRepository = {
     );
     return new Message(result.data);
   },
+  async delete(messageId: string): Promise<boolean> {
+    await api.delete(`/messages/${messageId}`);
+    return true;
+  }
 };
