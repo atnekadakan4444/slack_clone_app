@@ -1,7 +1,7 @@
 import { useNavigate } from "react-router-dom";
 import type { Channel } from "../../../modules/channels/channel.entity";
 import { channelRepository } from "../../../modules/channels/channel.repository";
-import { useState } from "react";
+import { useRef, useState } from "react";
 import { messageRepository } from "../../../modules/messages/message.repository";
 import type { Message } from "../../../modules/messages/message.entity";
 import { useUiStore } from "../../../modules/ui/ui.state";
@@ -25,9 +25,10 @@ function MainContent(props: Props) {
     messages,
     setMessages,
   } = props;
-  const { currentUser } = useCurrentUserStore();
   const navigation = useNavigate();
   const [content, setContent] = useState("");
+  const { currentUser } = useCurrentUserStore();
+  const fileInputRef = useRef<HTMLInputElement>(null);
 
   const groupMessagesByDate = () => {
     const messageMap = new Map<string, Message[]>();
@@ -83,6 +84,22 @@ function MainContent(props: Props) {
     }
   };
 
+  const uploadImage = async (event: React.ChangeEvent<HTMLInputElement>) => {
+    try {
+      if (event.target.files == null || event.target.files[0] == null) return;
+      const file = event.target.files[0];
+      const newMessage = await messageRepository.uploadImage(
+        selectedWorkspaceId,
+        selectedChannel.id,
+        file,
+      );
+      setMessages([newMessage, ...messages]);
+    } catch (error) {
+      console.error("Error uploading image:", error);
+      alert("画像のアップロード中にエラーが発生しました。");
+    }
+  };
+
   return (
     <div className="main-content">
       <header className="channel-header">
@@ -111,11 +128,12 @@ function MainContent(props: Props) {
             style={{ display: "flex", flexDirection: "column-reverse" }}
           >
             {group.messages.map((message) => {
-              const user = message.user.id == currentUser?.id ? currentUser : message.user;
+              const user =
+                message.user.id == currentUser?.id ? currentUser : message.user;
 
               return (
                 <div key={message.id} className="message">
-                  <div className="avatar">
+                  <div className="avatar" ƒ>
                     <div className={`avatar-img `}>
                       <img
                         src={user.iconUrl}
@@ -145,6 +163,17 @@ function MainContent(props: Props) {
                       </button>
                     </div>
                     <div className="message-text">{message.content}</div>
+                    {message.imageUrl && (
+                      <div className="message-image-container">
+                        <div className="message-image-wrapper">
+                          <img
+                            src={message.imageUrl}
+                            alt="Posted image"
+                            className="message-image"
+                          />
+                        </div>
+                      </div>
+                    )}
                   </div>
                 </div>
               );
@@ -164,8 +193,17 @@ function MainContent(props: Props) {
             onChange={(e) => setContent(e.target.value)}
           />
           <div className="image-upload">
-            <input type="file" style={{ display: "none" }} accept="image/*" />
-            <button className="action-button">
+            <input
+              type="file"
+              ref={fileInputRef}
+              style={{ display: "none" }}
+              accept="image/*"
+              onChange={uploadImage}
+            />
+            <button
+              className="action-button"
+              onClick={() => fileInputRef.current?.click()}
+            >
               <svg
                 viewBox="0 0 20 20"
                 width="18"
