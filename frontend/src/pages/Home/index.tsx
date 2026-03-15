@@ -11,6 +11,7 @@ import { Channel } from "../../modules/channels/channel.entity";
 import { channelRepository } from "../../modules/channels/channel.repository";
 import { Message } from "../../modules/messages/message.entity";
 import { messageRepository } from "../../modules/messages/message.repository";
+import { subscribe, unsubscribe } from "../../lib/api/socket";
 
 function Home() {
   const { currentUser } = useCurrentUserStore();
@@ -33,6 +34,8 @@ function Home() {
 
   useEffect(() => {
     fetchChannels();
+    subscribe(workspaceId!, handleNewMessage, handleDeleteMessage);
+    return () => unsubscribe(workspaceId!);
   }, [workspaceId]);
 
   useEffect(() => {
@@ -57,13 +60,23 @@ function Home() {
     }
   };
 
-  const  fetchMessages = async () => {
+  const fetchMessages = async () => {
     try {
       const messages = await messageRepository.find(workspaceId!, channelId!);
       setMessages(messages);
     } catch (error) {
       console.error("メッセージの取得に失敗:", error);
     }
+  };
+
+  const handleNewMessage = (message: Message) => {
+    setMessages((messages) => [message, ...messages]);
+  };
+
+  const handleDeleteMessage = (messageId: string) => {
+    setMessages((messages) =>
+      messages.filter((msg) => msg.id !== messageId),
+    );
   };
 
   if (currentUser == null) return <Navigate to="/signin" />;
