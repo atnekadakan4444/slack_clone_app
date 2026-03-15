@@ -4,13 +4,27 @@ gem "rails", "~> 8.0.0"
 gem "pg", "~> 1.1"
 gem "puma", ">= 5.0"
 gem "jbuilder"
+
+# 認証
 gem "devise"
 gem "devise-jwt"
+gem "jwt"
+
+# CORS
 gem "rack-cors"
 
-# Active Storage (ファイルアップロード)
-# Railsに標準同梱
+# 環境変数
+gem "dotenv-rails"
 
-group :development, :production do
+# Active Storage（ファイルアップロード・画像処理）
+gem "image_processing", "~> 1.2"
+gem "aws-sdk-s3", require: false        # S3ストレージ（本番環境用）
+gem "google-cloud-storage", require: false  # GCSストレージ（本番環境用）
+gem "azure-storage-blob", require: false    # Azureストレージ（本番環境用）
+
+# Action Cable（リアルタイム通信）
+gem "redis", ">= 4.0.1"
+
+group :development do
   gem "bootsnap", require: false
 end
