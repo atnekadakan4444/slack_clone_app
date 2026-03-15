@@ -1,0 +1,16 @@
+source "https://rubygems.org"
+
+gem "rails", "~> 8.0.0"
+gem "pg", "~> 1.1"
+gem "puma", ">= 5.0"
+gem "jbuilder"
+gem "devise"
+gem "devise-jwt"
+gem "rack-cors"
+
+# Active Storage (ファイルアップロード)
+# Railsに標準同梱
+
+group :development, :production do
+  gem "bootsnap", require: false
+end

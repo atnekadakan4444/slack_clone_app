@@ -1,0 +1,16 @@
+/.bundle
+/.byebug_history
+/db/*.sqlite3
+/db/*.sqlite3-journal
+/log/*
+!/log/.keep
+/node_modules
+/public/assets
+/storage/*
+!/storage/.keep
+/tmp/*
+!/tmp/.keep
+/.env
+/config/master.key
+/config/credentials.yml.enc
+.DS_Store
