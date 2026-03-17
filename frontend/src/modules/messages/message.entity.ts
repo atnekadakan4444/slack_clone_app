@@ -1,4 +1,3 @@
-import api from "../../lib/api";
 import { User } from "../users/user.entity";
 
 export class Message {

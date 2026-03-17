@@ -1,0 +1,37 @@
+services:
+  # バックエンド API (Express + TypeORM + SQLite)
+  api:
+    build:
+      context: ./slack-clone-api
+    ports:
+      - "8888:8888"
+    volumes:
+      # SQLite データベースを永続化
+      - api_data:/app/data
+      # アップロードファイルを永続化
+      - api_uploads:/app/uploads
+    env_file:
+      - ./slack-clone-api/.env
+    environment:
+      # コンパイル済み JS ファイルのパスを指定（TypeScript ソースは dist/ に出力済み）
+      DB_TYPEORM_ENTITIES: "dist/**/*.entity.js"
+      DB_TYPEORM_MIGRATIONS: "dist/migration/**/*.js"
+      DB_TYPEORM_SUBSCRIBERS: "dist/subscriber/**/*.js"
+    restart: unless-stopped
+
+  # フロントエンド (React + Vite → Nginx)
+  frontend:
+    build:
+      context: ./frontend
+      args:
+        # ブラウザからアクセスする API の URL（ホスト側のポートを指定）
+        VITE_API_URL: http://localhost:8888
+    ports:
+      - "5173:80"
+    depends_on:
+      - api
+    restart: unless-stopped
+
+volumes:
+  api_data:
+  api_uploads:
