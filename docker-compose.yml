@@ -24,8 +24,8 @@ services:
     build:
       context: ./frontend
       args:
-        # ブラウザからアクセスする API の URL（ホスト側のポートを指定）
-        VITE_API_URL: http://localhost:8888
+        # ブラウザからアクセスする API の URL（develop/.env の VITE_API_URL から読み込む）
+        VITE_API_URL: ${VITE_API_URL:-http://localhost:8888}
     ports:
       - "5173:80"
     depends_on:
